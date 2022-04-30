@@ -333,7 +333,7 @@ class WsdlNext {
     return response;
   }
 
-  static getXmlDataAsJson<T>(xml: string): T {
+  static getXmlDataAsJson(xml: string): { [key: string]: any; } {
     const xmlObj = new xmldoc.XmlDocument(xml);
     const xmlNamespace = WsdlNext.getNamespace(xmlObj.name, true);
 
@@ -345,10 +345,10 @@ class WsdlNext {
     const extractedData = WsdlNext.getValFromXmlElement(extractNode);
 
     if (extractedData.Body) {
-      return <T>extractedData.Body;
+      return extractedData.Body;
     }
 
-    return <T>extractedData;
+    return extractedData;
   }
 }
 
