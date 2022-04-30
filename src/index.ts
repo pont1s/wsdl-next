@@ -198,11 +198,11 @@ class WsdlNext {
     );
   }
 
-  async getNamespaces(): Promise<Array<string>> {
+  async getNamespaces(): Promise<Array<{ short: string, full: string }>> {
     const wsdlObj = new xmldoc.XmlDocument(await this.getWsdl());
     const wsdlObjAttrNames = Object.keys(wsdlObj.attr);
 
-    return wsdlObjAttrNames.reduce((store, attrKey) => {
+    return wsdlObjAttrNames.reduce((store: Array<{ short: string, full: string }>, attrKey) => {
       const attrNamespace = WsdlNext.getNamespace(attrKey, false);
       const attrName = WsdlNext.getNameWithoutNamespace(attrKey);
 
