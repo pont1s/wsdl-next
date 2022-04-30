@@ -1,5 +1,7 @@
-import axios, { AxiosResponseHeaders } from 'axios';
+import axios, { AxiosResponseHeaders, AxiosRequestConfig } from 'axios';
 import xmldoc, { XmlAttributes, XmlDocument, XmlElement } from 'xmldoc';
+import { Agent } from 'http';
+import { Agent as AgentHttps } from 'https';
 import merge from './deepMergeObjectHelper';
 
 interface Namespace {
@@ -13,12 +15,17 @@ class WsdlNext {
 
   private readonly wsdl: string;
 
+  public static requestAgent: Agent | AgentHttps;
+
   private constructor(url: string, wsdl: string) {
     this.url = url;
     this.wsdl = wsdl;
   }
 
   static async create(url: string) {
+    const urlTmp = new URL(url);
+    WsdlNext.requestAgent = urlTmp.protocol === 'http:'
+      ? new Agent({ keepAlive: true }) : new AgentHttps({ keepAlive: true });
     const wsdl = await WsdlNext.getWsdl(url);
     return new WsdlNext(url, wsdl);
   }
@@ -26,10 +33,18 @@ class WsdlNext {
   private static async request(
     url: string,
   ): Promise<{ headers: AxiosResponseHeaders, data: unknown }> {
-    const response = await axios({
+    const axiosConfig: AxiosRequestConfig = {
       url,
       method: 'GET',
-    });
+    };
+
+    if (WsdlNext.requestAgent instanceof Agent) {
+      axiosConfig.httpAgent = WsdlNext.requestAgent;
+    } else {
+      axiosConfig.httpsAgent = WsdlNext.requestAgent;
+    }
+
+    const response = await axios(axiosConfig);
 
     return {
       headers: response.headers,
