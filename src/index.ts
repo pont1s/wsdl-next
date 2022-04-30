@@ -15,33 +15,35 @@ class WsdlNext {
 
   private readonly wsdl: string;
 
-  public static requestAgent: Agent | AgentHttps;
+  public readonly requestAgent: Agent | AgentHttps;
 
-  private constructor(url: string, wsdl: string) {
+  private constructor(url: string, wsdl: string, requestAgent: Agent | AgentHttps) {
     this.url = url;
     this.wsdl = wsdl;
+    this.requestAgent = requestAgent;
   }
 
   static async create(url: string) {
     const urlTmp = new URL(url);
-    WsdlNext.requestAgent = urlTmp.protocol === 'http:'
+    const requestAgent = urlTmp.protocol === 'http:'
       ? new Agent({ keepAlive: true }) : new AgentHttps({ keepAlive: true });
-    const wsdl = await WsdlNext.getWsdl(url);
-    return new WsdlNext(url, wsdl);
+    const wsdl = await WsdlNext.getWsdl(url, requestAgent);
+    return new WsdlNext(url, wsdl, requestAgent);
   }
 
   private static async request(
     url: string,
+    requestAgent: Agent | AgentHttps,
   ): Promise<{ headers: AxiosResponseHeaders, data: unknown }> {
     const axiosConfig: AxiosRequestConfig = {
       url,
       method: 'GET',
     };
 
-    if (WsdlNext.requestAgent instanceof Agent) {
-      axiosConfig.httpAgent = WsdlNext.requestAgent;
+    if (requestAgent instanceof Agent) {
+      axiosConfig.httpAgent = requestAgent;
     } else {
-      axiosConfig.httpsAgent = WsdlNext.requestAgent;
+      axiosConfig.httpsAgent = requestAgent;
     }
 
     const response = await axios(axiosConfig);
@@ -52,8 +54,8 @@ class WsdlNext {
     };
   }
 
-  private static async getWsdl(url: string): Promise<string> {
-    const result = await this.request(url);
+  private static async getWsdl(url: string, requestAgent: Agent | AgentHttps): Promise<string> {
+    const result = await this.request(url, requestAgent);
 
     if (result.headers['content-type'].indexOf('xml') === -1) {
       throw new Error('no wsdl/xml response');
