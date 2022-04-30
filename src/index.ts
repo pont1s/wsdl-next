@@ -264,7 +264,7 @@ class WsdlNext {
     return operations.map((operationItem) => operationItem.attr.name).sort();
   }
 
-  private static getValFromXmlElement(xmlElement: XmlElement): { [key: string]: unknown; } {
+  private static getValFromXmlElement(xmlElement: XmlElement): { [key: string]: any; } {
     const elementName = WsdlNext.getNameWithoutNamespace(xmlElement.name);
 
     if (!elementName) {
@@ -333,7 +333,7 @@ class WsdlNext {
     return response;
   }
 
-  static getXmlDataAsJson(xml: string): { [key: string]: unknown; } {
+  static getXmlDataAsJson<T>(xml: string): T {
     const xmlObj = new xmldoc.XmlDocument(xml);
     const xmlNamespace = WsdlNext.getNamespace(xmlObj.name, true);
 
@@ -344,11 +344,7 @@ class WsdlNext {
 
     const extractedData = WsdlNext.getValFromXmlElement(extractNode);
 
-    if (extractedData.Body) {
-      return extractedData.Body as { [key: string]: unknown; };
-    }
-
-    return extractedData;
+    return <T>extractedData;
   }
 }
 
