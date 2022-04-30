@@ -344,6 +344,10 @@ class WsdlNext {
 
     const extractedData = WsdlNext.getValFromXmlElement(extractNode);
 
+    if (extractedData.Body) {
+      return <T>extractedData.Body;
+    }
+
     return <T>extractedData;
   }
 }
