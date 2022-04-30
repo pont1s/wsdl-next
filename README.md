@@ -25,7 +25,7 @@ yarn add wsdl-next
 
 ### Create WSDL
 
-WsdlNext(url: string)
+WsdlNext.create(url: string)
 
 ```ts
 wsdl = await WsdlNext.create('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL');
