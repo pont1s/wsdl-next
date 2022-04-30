@@ -5,7 +5,7 @@ import merge from './deepMergeObjectHelper';
 interface Namespace {
   params: xmldoc.XmlAttributes | xmldoc.XmlAttributes[],
   name: string,
-  namespace: string
+  namespace: string,
 }
 
 class WsdlNext {

@@ -1,10 +1,10 @@
 <div align="center">
-    <h1>soap-next</h1>
-    <p>soap-next is a simple SOAP client for Node.js</p>
+    <h1>wsdl-next</h1>
+    <p>wsdl-next is a simple WSDL parcer for Node.js</p>
 
-[![npm version](https://badgen.net/npm/v/soap-next)](https://www.npmjs.com/package/soap-next)
-[![npm downloads](https://badgen.net/npm/dm/soap-next)](https://www.npmjs.com/package/soap-next)
-[![npm downloads](https://badgen.net/npm/license/soap-next)](https://www.npmjs.com/package/soap-next)
+[![npm version](https://badgen.net/npm/v/wsdl-next)](https://www.npmjs.com/package/wsdl-next)
+[![npm downloads](https://badgen.net/npm/dm/wsdl-next)](https://www.npmjs.com/package/wsdl-next)
+[![npm downloads](https://badgen.net/npm/license/wsdl-next)](https://www.npmjs.com/package/wsdl-next)
 </div>
 
 ## Installing
@@ -12,72 +12,76 @@
 Install with npm
 
 ```shell
-npm install soap-next
+npm install wsdl-next
 ```
 
 Install with yarn
 
 ```shell
-yarn add soap-next
+yarn add wsdl-next
 ```
 
 ## Basic Usage
 
-### Create SOAP client
+### Create WSDL
 
-SoapNext(SoapParams, SoapOptions)
+WsdlNext(url: string)
 
 ```ts
-const soapClient = new SoapNext({
-    host: 'webservices.oorsprong.org',
-    path: '/websamples.countryinfo/CountryInfoService.wso',
-    wsdl: '/websamples.countryinfo/CountryInfoService.wso?WSDL',
-}, {
-  secure: false,
-});
+wsdl = new WsdlNext('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL');
 ```
 
-**SoapParams**
+### getNamespaces
+
+Returns a collection with all available namespaces
 
 ```ts
-interface SoapParams {
-  host: string,
-  path: string,
-  wsdl: string,
-  soapHeaders?: Array<SoapHeaders>,
-  httpHeaders?: HttpHeaders,
+const result = await wsdl.getNamespaces();
+```
+
+### getMethodParamsByName
+
+Returns all response/request parameter for a given function name
+
+```ts
+{
+  params: {
+    params: xmldoc.XmlAttributes | xmldoc.XmlAttributes[], 
+    name: string,
+    namespace: string,
+  },
+  response: {
+    params: xmldoc.XmlAttributes | xmldoc.XmlAttributes[],
+    name: string,
+    namespace: string,
+  }
 }
 ```
 
-**SoapOptions**
-
 ```ts
-interface SoapOptions {
-  secure: boolean,
-}
+const result = await wsdl.getMethodParamsByName('CountryName');
 ```
 
-### Call SOAP method
+### getAllMethods:
 
-soapClient.call(method: string, params: SoapBodyParams = {}, attributes: SoapBodyAttributes = {})
+Returns all in WSDL available methods
 
 ```ts
-const result = await soapClient.call('CountryName', {
-  sCountryISOCode: 'US',
-});
+ const result = await wsdl.getAllMethods();
 ```
 
-### Get all SOAP method
+### getXmlDataAsJson:
 
+Returns data from the given XML as JSON
 
 ```ts
-const result = await soapClient.getAllFunctions();
+const result = WsdlNext.getXmlDataAsJson(xmlResponse);
 ```
 
 ## Credits
 
-soap-next was inspired by [easysoap](https://github.com/moszeed/easysoap), rewritten in TypeScript for further improvement.
+wsdl-next was inspired by [wsdlrdr](https://github.com/moszeed/wsdlrdr), rewritten in TypeScript for further improvement.
 
 ## License
 
-soap-next is released under the MIT License. See the bundled LICENSE file for details.
+wsdl-next is released under the MIT License. See the bundled LICENSE file for details.
