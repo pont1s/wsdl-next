@@ -15,7 +15,7 @@ describe('soap-next', () => {
   let wsdl: WsdlNext;
 
   beforeEach(async () => {
-    wsdl = new WsdlNext('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL');
+    wsdl = await WsdlNext.create('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL');
   });
 
   test('Check constructor created', async () => {
@@ -23,8 +23,7 @@ describe('soap-next', () => {
   });
 
   test('Check error with not XML response', async () => {
-    const wsdlError = new WsdlNext('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso');
-    const error = await getError(async () => wsdlError.getAllMethods());
+    const error = await getError(async () => WsdlNext.create('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso'));
     expect(error).not.toBeInstanceOf(NoErrorThrownError);
   });
 

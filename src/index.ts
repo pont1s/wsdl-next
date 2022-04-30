@@ -11,15 +11,23 @@ interface Namespace {
 class WsdlNext {
   private readonly url: string;
 
-  private wsdl: string;
+  private readonly wsdl: string;
 
-  constructor(url: string) {
+  private constructor(url: string, wsdl: string) {
     this.url = url;
+    this.wsdl = wsdl;
   }
 
-  private async request(): Promise<{ headers: AxiosResponseHeaders, data: unknown }> {
+  static async create(url: string) {
+    const wsdl = await WsdlNext.getWsdl(url);
+    return new WsdlNext(url, wsdl);
+  }
+
+  private static async request(
+    url: string,
+  ): Promise<{ headers: AxiosResponseHeaders, data: unknown }> {
     const response = await axios({
-      url: this.url,
+      url,
       method: 'GET',
     });
 
@@ -29,12 +37,8 @@ class WsdlNext {
     };
   }
 
-  private async getWsdl(): Promise<string> {
-    if (typeof this.wsdl !== 'undefined') {
-      return this.wsdl;
-    }
-
-    const result = await this.request();
+  private static async getWsdl(url: string): Promise<string> {
+    const result = await this.request(url);
 
     if (result.headers['content-type'].indexOf('xml') === -1) {
       throw new Error('no wsdl/xml response');
@@ -199,7 +203,7 @@ class WsdlNext {
   }
 
   async getNamespaces(): Promise<Array<{ short: string, full: string }>> {
-    const wsdlObj = new xmldoc.XmlDocument(await this.getWsdl());
+    const wsdlObj = new xmldoc.XmlDocument(this.wsdl);
     const wsdlObjAttrNames = Object.keys(wsdlObj.attr);
 
     return wsdlObjAttrNames.reduce((store: Array<{ short: string, full: string }>, attrKey) => {
@@ -229,7 +233,7 @@ class WsdlNext {
   async getMethodParamsByName(
     method: string,
   ): Promise<{ request: Array<Namespace>, response: Array<Namespace> }> {
-    const wsdlObj = new xmldoc.XmlDocument(await this.getWsdl());
+    const wsdlObj = new xmldoc.XmlDocument(this.wsdl);
     const wsdlStruct = WsdlNext.getNamespace(wsdlObj.name, true);
     const portType = wsdlObj.childNamed(`${wsdlStruct}portType`);
     const messages = wsdlObj.childrenNamed(`${wsdlStruct}message`);
@@ -256,7 +260,7 @@ class WsdlNext {
   }
 
   async getAllMethods(): Promise<Array<string>> {
-    const wsdlObj: XmlDocument = new xmldoc.XmlDocument(await this.getWsdl());
+    const wsdlObj: XmlDocument = new xmldoc.XmlDocument(this.wsdl);
     const wsdlStruct = WsdlNext.getNamespace(wsdlObj.name, true);
     const binding = wsdlObj.childNamed(`${wsdlStruct}binding`);
     const operations = binding.childrenNamed(`${wsdlStruct}operation`);

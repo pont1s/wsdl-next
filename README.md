@@ -28,7 +28,7 @@ yarn add wsdl-next
 WsdlNext(url: string)
 
 ```ts
-wsdl = new WsdlNext('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL');
+wsdl = await WsdlNext.create('http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso?WSDL');
 ```
 
 ### getNamespaces
